@@ -15,8 +15,7 @@
             android:src="@drawable/title_navigate" 
             
             android:layout_alignParentTop="true"
-            android:layout_marginTop="100dp"
-            android:layout_alignParentLeft="true"
+             android:layout_alignParentLeft="true"
             android:layout_marginLeft="30dp"/>
         <TextView
             android:id="@+id/planname"
@@ -65,7 +64,26 @@
             android:layout_alignLeft="@+id/imageView1"
             android:layout_below="@+id/red_line1"
             />
-         
+         <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"            
+            android:orientation="horizontal"
+            android:gravity="center"         
+            >
+
+             <Spinner
+                 android:id="@+id/spinner1"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content" 
+                 android:layout_gravity="top"/>
+
+             <CheckBox
+                 android:id="@+id/checkBox1"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="@string/check_order"
+                 android:layout_gravity="right" />
+         </LinearLayout>
     <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="1dp"            
@@ -81,8 +99,7 @@
         android:layout_below="@+id/red_line2"
         android:layout_weight="1"
        />
-   
 
-        
+    
 
 </RelativeLayout>
