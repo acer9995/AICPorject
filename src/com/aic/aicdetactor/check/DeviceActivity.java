@@ -143,7 +143,8 @@ public class DeviceActivity extends Activity implements OnClickListener{
 					.getDeviceItemList(mStationIndex);
 
 			CheckStatus status = null;
-			int itemindex = mStationIndex;
+			//int itemindex = mStationIndex;
+			int itemindex = 0;
 			mDataList.clear();
 			for (int i = 0; i < deviceItemList.size(); i++) {
 				Map<String, String> map = new HashMap<String, String>();
@@ -154,8 +155,10 @@ public class DeviceActivity extends Activity implements OnClickListener{
 				map.put(CommonDef.device_info.INDEX,""+(itemindex+1) );
 				map.put(CommonDef.device_info.NAME, ((myApplication) getApplication())
 						.getDeviceItemName(deviceItemList.get(i)));
-				((myApplication) getApplication())
-						.getDeviceItemDefList(deviceItemList.get(i));
+				
+//				((myApplication) getApplication())
+//						.getDeviceItemDefList(deviceItemList.get(i));
+//				
 				map.put(CommonDef.device_info.DEADLINE, status.mLastTime);
 				map.put(CommonDef.device_info.STATUS, status.getStatus());
 			
@@ -278,14 +281,14 @@ public class DeviceActivity extends Activity implements OnClickListener{
 		}
 		boolean bok = false;
 		for (int i = 0; i < turnInfo.size(); i++) {
-			String strstartTime = turnInfo.get(i).StartTime;
-			if (systemTime.compareTo(strstartTime) > 0 && systemTime.compareTo(turnInfo.get(i).EndTime)<0) {
+			String strstartTime = turnInfo.get(i).Start_Time;
+			if (systemTime.compareTo(strstartTime) > 0 && systemTime.compareTo(turnInfo.get(i).End_Time)<0) {
 				((myApplication) getApplication()).mTurnNumber=turnInfo.get(i).Number;
-				((myApplication) getApplication()).mTurnStartTime=turnInfo.get(i).StartTime;
-				((myApplication) getApplication()).mTurnEndTime=turnInfo.get(i).EndTime;
+				((myApplication) getApplication()).mTurnStartTime=turnInfo.get(i).Start_Time;
+				((myApplication) getApplication()).mTurnEndTime=turnInfo.get(i).End_Time;
 				Log.d(TAG,"IsInworkerTime() NUMBER is " + turnInfo.get(i).Number +
 						",startTime is " +turnInfo.get(i).Number
-						+",endTime is " +turnInfo.get(i).EndTime);
+						+",endTime is " +turnInfo.get(i).End_Time);
 				bok = true;
 			}
 		}

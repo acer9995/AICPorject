@@ -32,7 +32,7 @@ public class MyJSONParse {
 	private int mIsReverseChecking = 0;//是否反向巡检
 	private String mCurrentFileName = null;//当前巡检的文件名即guid
 	private String mSavePath = null;//检查路线数据存储的路径
-	private List<Route> mRouteList = null;
+	private List<T_Route> mRouteList = null;
 
 	// partitemData split key word
 	public static String PARTITEMDATA_SPLIT_KEYWORD = "\\*";
@@ -67,6 +67,23 @@ public class MyJSONParse {
 		editor.commit();
 	}
 	
+	/**
+	 * 给指定的DeviceItem 对象下赋值新的GUID
+	 */
+	void genGUIDUnderDeviceItem(JSONObject object){
+		if(object == null) return;
+		JSONObject json = object;
+		
+		try {
+			json.put(KEY.KEY_Data_Exist_Guid, SystemUtil.createGUID());
+			Log.d(TAG, "genGUIDUnderDeviceItem() object is "+json.toString());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
 	/**本想法是通过SharedPreferences来存储正在巡检的路线的相关索引等信息，例如刚在巡检到哪一具体项了。
 	 * 
 	 * 
@@ -93,7 +110,7 @@ public class MyJSONParse {
 		mRouteList = mRouteDao.getRouteInfoByFilePath(list);
 		
 		for(int index =0;index <mRouteList.size();index++){
-			String path = mRouteList.get(index).getFileName();
+			String path = mRouteList.get(index).Path;
 			
 			//从此开始关联各个RouteInfo相关项
 			parseData(index,path);
@@ -116,36 +133,27 @@ public class MyJSONParse {
 			mRouteDao = new RouteDao(mContext);
 			}
 		//if(mRouteDao.getCount()<12){		
-		mRouteDao.insertNewRouteInfo(fileName, path);
+		mRouteDao.insertNewRouteInfo(path);
 		//}
 		return 1;
 	}
-	public static Route getPlanInfo(String Routepath){
-		Route route = new Route();
+	public static T_Route getPlanInfo(String Routepath){
+		T_Route route = new T_Route();
 		String data = SystemUtil.openFile(Routepath);	
-		
+		route.Path = Routepath;
 		if (data != null) {
 			
 			try {
-				JSONTokener jsonTokener = new JSONTokener(data);
-				JSONArray jsonArray = (JSONArray) jsonTokener.nextValue();
-				for (int i = 0; i < jsonArray.length(); i++) {
-				//	Log.d(TAG, "data is not null" + "i = " + i);
-					JSONObject jsonObject = jsonArray.getJSONObject(i);
-					String index = jsonObject.getString("Index");
-					Log.e("luotest", "name = " + index + ","+jsonObject.toString());
-					if (index.equals(CommonDef.route_info.JSON_INDEX)) {
-						route.mPlanName_Root_Object = jsonObject;
-					} else if (index.equals(CommonDef.turn_info.JSON_INDEX)) {
-						route.mTurnInfo_Root_Object = jsonObject;
-					} else if (index.equals(CommonDef.worker_info.JSON_INDEX)) {
-						route.mWorkerInfo_Root_Object = jsonObject;
-					} else if (index.equals(CommonDef.station_info.JSON_INDEX)) {
-						route.mStationInfo_Root_Object = jsonObject;
-					} else if(index.equals(CommonDef.organization_info.JSON_INDEX)){						
-						route.mOrganization_Root_Object = jsonObject;
-					}
-				}
+				JSONTokener jsonTokener = new JSONTokener(data);		
+				JSONObject object = (JSONObject) jsonTokener.nextValue();
+				
+				route.mGloableObject = object.getJSONObject(GlobalInfo.NodeName);
+				route.mLineObject = object.getJSONObject(T_Line.RootNodeName);
+				route.mStationArrary= (JSONArray) object.getJSONArray("StationInfo");
+				route.mTurnArrary= (JSONArray) object.getJSONArray(T_Turn.RootNodeName);
+				route.mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
+				JSONObject sub_object = object.getJSONObject(T_Period.RootNodeName);
+				route.mT_PeriodArray = sub_object.getJSONArray(T_Period.ArrayName);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -170,14 +178,14 @@ public class MyJSONParse {
 	 */
 	public void SaveData(int RouteIndex,String fileName){
 		
-		Route info =mRouteList.get(RouteIndex);
+		T_Route info =mRouteList.get(RouteIndex);
 		
-		try {
-			info.SaveData(fileName);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			info.SaveData(fileName);
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 	}
 	
@@ -187,32 +195,54 @@ public class MyJSONParse {
 	 * @param routeIndex 在数据库中的索引
 	 * @param path 对应的文件名
 	 */
-	private void parseData(int routeIndex,String path) {
+	private void parseData(int routeIndex,String path) {			
+			
 		String data = SystemUtil.openFile(path);	
 	
 		if (data != null) {
 			Log.d(TAG, "data is not null");
 			try {
-				JSONTokener jsonTokener = new JSONTokener(data);
-				JSONArray jsonArray = (JSONArray) jsonTokener.nextValue();
-				for (int i = 0; i < jsonArray.length(); i++) {
-					Log.d(TAG, "data is not null" + "i = " + i);
-					JSONObject jsonObject = jsonArray.getJSONObject(i);
-					String index = jsonObject.getString("Index");
-					Log.d(TAG, "name = " + index);
-					if (index.equals(CommonDef.route_info.JSON_INDEX)) {
-						mRouteList.get(routeIndex).mPlanName_Root_Object = jsonObject;
-					} else if (index.equals(CommonDef.turn_info.JSON_INDEX)) {
-						mRouteList.get(routeIndex).mTurnInfo_Root_Object = jsonObject;
-					} else if (index.equals(CommonDef.worker_info.JSON_INDEX)) {
-						mRouteList.get(routeIndex).mWorkerInfo_Root_Object = jsonObject;						
-					} else if (index.equals(CommonDef.station_info.JSON_INDEX)) {
-						mRouteList.get(routeIndex).mStationInfo_Root_Object = jsonObject;
-					} else if(index.equals(CommonDef.organization_info.JSON_INDEX)){						
-						mRouteList.get(routeIndex).mOrganization_Root_Object = jsonObject;
+				JSONTokener jsonTokener = new JSONTokener(data);		
+				JSONObject object = (JSONObject) jsonTokener.nextValue();
+				
+				mRouteList.get(routeIndex).mGloableObject = object.getJSONObject(GlobalInfo.NodeName);
+				mRouteList.get(routeIndex).mLineObject =object.getJSONObject(T_Line.RootNodeName);
+				mRouteList.get(routeIndex).mStationArrary= (JSONArray) object.getJSONArray("StationInfos");
+				mRouteList.get(routeIndex).mTurnArrary= (JSONArray) object.getJSONArray(T_Turn.RootNodeName);
+				mRouteList.get(routeIndex).mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
+				
+				JSONObject sub_object = object.getJSONObject(T_Period.RootNodeName);
+				mRouteList.get(routeIndex).mT_PeriodArray = sub_object.getJSONArray(T_Period.ArrayName);
+				
+				if (mRouteList.get(routeIndex).mWorkerArrary != null) {
+					try {
+
+						mRouteList.get(routeIndex).mWorkerList = MyJSONParse.parseWorkerNode(mRouteList.get(routeIndex).mWorkerArrary);
+						Log.e("luotest", "parseBaseInfo() mWorkerList is" + mRouteList.get(routeIndex).mWorkerList.toString());
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					//mRouteList.get(routeIndex).parseBaseInfo();
 				}
+				 if(mRouteList.get(routeIndex).mLineObject != null){
+				 try {
+					 mRouteList.get(routeIndex).mLineInfo = MyJSONParse.parseRouteNameNode(mRouteList.get(routeIndex).mLineObject);
+					
+				 } catch (JSONException e) {
+				 // TODO Auto-generated catch block
+				 e.printStackTrace();
+				 }
+				 }
+				if (mRouteList.get(routeIndex).mTurnArrary != null) {
+					try {
+						mRouteList.get(routeIndex).mTurnList = MyJSONParse.parseTurnNode(mRouteList.get(routeIndex).mTurnArrary);
+						Log.e("luotest", "parseBaseInfo() mTurnList is" + mRouteList.get(routeIndex).mTurnList.toString());
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -223,22 +253,11 @@ public class MyJSONParse {
 	
 	public void setAuxiliaryNode(int RouteIndex,Object object){
 
-		mRouteList.get(RouteIndex).mAuxiliary_Root_Object = object;
+		//mRouteList.get(RouteIndex).mAuxiliary_Root_Object = object;
 	}
 
 
-	public String getDeviceQueryNumber(Object object){
-		if(object == null )return null;
-		String strNumber = null;
-		JSONObject json = (JSONObject)object;
-		try {
-			strNumber = json.getString(KEY.KEY_QUERY_NUMBER);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return strNumber;
-	}
+	
 	
 	/**
 	 * 巡检时，记录巡检选择的ITEMDEF，以备向服务器回传数据
@@ -370,89 +389,7 @@ public class MyJSONParse {
 	}
 	
 	
-//	public CheckStatus getDevicePartItemCount(Object deviceItemObject)
-//			throws JSONException {
-//
-//		int count = 0;
-//		CheckStatus status = new CheckStatus();
-//		JSONObject object = (JSONObject) deviceItemObject;
-//		List<Object> partlist = this.getPartList(object);
-//		count = partlist.size();
-//		JSONObject itemObject = null;
-//		String checkTimeStr = null;
-//		
-//		for (int k = 0; k < partlist.size(); k++) {
-//			Log.d(TAG, " getDevicePartItemCount k=" + k + "," + partlist.get(k));
-//			itemObject = (JSONObject) partlist.get(k);			
-//			checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
-//			if(checkTimeStr != null){
-//				status.mCheckedCount++;
-//				status.mLastTime = checkTimeStr;
-//			}
-//		}
-//		status.mSum = count;
-//		return status;
-//	}
-//
-//	public CheckStatus getStationPartItemCount(Object staionItemObject)
-//			throws JSONException {
-//		int count = 0;
-//		CheckStatus status = new CheckStatus();
-//		String checkTimeStr=null;
-//		JSONObject object = (JSONObject) staionItemObject;
-//		List<Object> devicelist = this.getDeviceList(object);
-//		List<Object> partlist =null;
-//		for (int n = 0; n < devicelist.size(); n++) {
-//			partlist = this.getPartList(devicelist.get(n));
-//			count = count + partlist.size();
-//			for(int k=0;k<partlist.size();k++){
-//				JSONObject itemObject = (JSONObject) partlist.get(k);				
-//				checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
-//				if(checkTimeStr != null){
-//					status.mCheckedCount++;
-//					status.mLastTime = checkTimeStr;
-//				}			
-//			}
-//		}
-//		status.mSum = count;
-//		return status;
-//	}
-//
-//	/**
-//	 * 统计各巡检路线的巡检子项
-//	 * @param routeIndex，是各个巡检路线的序号，在路线界面调用。
-//	 * @return
-//	 * @throws JSONException
-//	 */
-//	public CheckStatus getRoutePartItemCount(int routeIndex) throws JSONException {
-//		
-//		CheckStatus status = new CheckStatus();
-//		List<Object> list = getStationList(routeIndex);
-//		int count = 0;		
-//		String checkTimeStr=null;
-//		List<Object> devicelist  = null;
-//		for (int i = 0; i < list.size(); i++) {
-//			JSONObject object = (JSONObject) list.get(i);
-//			devicelist = this.getDeviceList(object);
-//			
-//			for (int n = 0; n < devicelist.size(); n++) {
-//				List<Object> partlist = this.getPartList(devicelist.get(n));
-//				count = count + partlist.size();
-//				for(int k=0;k<partlist.size();k++){
-//					JSONObject itemObject = (JSONObject) partlist.get(k);				
-//					checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
-//					if(checkTimeStr != null){
-//						status.mCheckedCount++;
-//						status.mLastTime = checkTimeStr;
-//					}
-//					
-//				}
-//			}
-//			status.mSum = count;
-//		}
-//
-//		return status;
-//	}
+
 
 	/**
 	 * 获取各个巡检路线的路线名称，在路线界面调用。
@@ -462,12 +399,11 @@ public class MyJSONParse {
 	 */
 	public String getRoutName(int routeIndex) throws JSONException {
 		String name = null;
-		if (mRouteList.get(routeIndex).mPlanName_Root_Object == null) {
+		if (mRouteList.get(routeIndex).mLineObject == null) {
 			Log.e(TAG, "getRoutName mPlanName_Root_Object is null");
 			return null;
 		}
-		JSONObject object = (JSONObject) mRouteList.get(routeIndex).mPlanName_Root_Object;
-		name = object.getString(KEY.KEY_PLANNAME);
+		name = mRouteList.get(routeIndex).Name;		
 		return name;
 	}
 
@@ -480,7 +416,7 @@ public class MyJSONParse {
 	public List<Object> getStationList(int routeIndex) throws JSONException {
 		mRouteIndex = routeIndex;
 		
-		if (mRouteList.get(mRouteIndex).mStationInfo_Root_Object == null)
+		if (mRouteList.get(mRouteIndex).mStationArrary == null)
 			return null;
 		
 		if (mRouteList.get(mRouteIndex).mStationList != null)
@@ -488,13 +424,13 @@ public class MyJSONParse {
 
 		mRouteList.get(mRouteIndex).mStationList = new ArrayList<Object>();
 		try {
-			JSONObject object = (JSONObject) mRouteList.get(mRouteIndex).mStationInfo_Root_Object;
+			
 
-			JSONArray array = object.getJSONArray(KEY.KEY_STATIONINFO);
+			JSONArray array = mRouteList.get(mRouteIndex).mStationArrary;
 
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject subObject = array.getJSONObject(i);
-				Log.d(TAG, "I =" + i + subObject.getString(KEY.KEY_STATIONNAME));
+				
 				mRouteList.get(mRouteIndex).mStationList.add(subObject);
 
 			}
@@ -511,7 +447,7 @@ public class MyJSONParse {
 		try {
 			JSONObject newobject = (JSONObject) stationItemobject;
 
-			name = newobject.getString(KEY.KEY_STATIONNAME);
+			name = newobject.getString(KEY.KEY_NAME);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -530,21 +466,14 @@ public class MyJSONParse {
 		try {
 			JSONObject object2 = (JSONObject) StationItemobject;
 
-			JSONArray array = object2.getJSONArray(KEY.KEY_STATIONITEM);
+			JSONArray array = object2.getJSONArray(KEY.KEY_DEVICEITEM);
 			Log.d(TAG, " object is not null array.size is " + array.length());
 			for (int i = 0; i < array.length(); i++) {
 				Log.d(TAG, " getDeviceItem object i" + i);
 				JSONObject subObject = array.getJSONObject(i);
-				if (subObject.getString("Index").equals("6")) {
-					// list.add(subObject);
-					Log.d(TAG, " getDeviceItem object 6  i" + i);
-
-					JSONArray sub_Array = subObject.getJSONArray(KEY.KEY_DEVICEITEM);
-					for (int k = 0; k < sub_Array.length(); k++) {
-						list.add(sub_Array.getJSONObject(k));
-						Log.d(TAG, " getDeviceItem object 6  k " + k);
-					}
-				}
+				
+				genGUIDUnderDeviceItem(subObject);
+				list.add(subObject);			
 			}
 
 		} catch (Exception e) {
@@ -554,6 +483,20 @@ public class MyJSONParse {
 
 	}
 
+	public List<Object>getPartItem(Object object){
+		List<Object>list = new ArrayList<Object>();
+		
+		try {
+			JSONArray array = ((JSONObject)object).getJSONArray(KEY.KEY_PARTITEM);
+			for(int i=0;i<array.length();i++){
+				list.add(array.get(i));
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
+	}
 	/**
 	 *  input params must be StationItemIndex
 	 * @param stationIndex
@@ -569,19 +512,11 @@ public class MyJSONParse {
 			//每个stationItem
 			JSONObject stationItem = (JSONObject) getStationItem(mRouteIndex,mStationIndex);			
 			Log.d(TAG, " getDeviceItem  stationItem is " + stationItem.toString());
-			JSONArray array = stationItem.getJSONArray(KEY.KEY_STATIONITEM);
+			JSONArray array = stationItem.getJSONArray(KEY.KEY_DEVICEITEM);
 			Log.d(TAG, " getDeviceItem  stationItem array " + array.toString());
 			for (int i = 0; i < array.length(); i++) {				
 				JSONObject subObject = array.getJSONObject(i);
-				if (subObject.getString("Index").equals("6")) {
-					// list.add(subObject);
-					JSONArray sub_Array = subObject.getJSONArray(KEY.KEY_DEVICEITEM);
-					Log.d(TAG, " getDeviceItem sub_Array " + ","+sub_Array.toString());
-					for (int k = 0; k < sub_Array.length(); k++) {
-						list.add(sub_Array.getJSONObject(k));
-						Log.d(TAG, " getDeviceItem sub_Array " + k + ","+sub_Array.getJSONObject(k).toString());
-					}
-				}
+				list.add(subObject);
 			}
 
 		} catch (Exception e) {
@@ -601,20 +536,16 @@ public class MyJSONParse {
 		List<Object> list = new ArrayList<Object>();
 		try {
 			JSONObject object2 = (JSONObject) StationItemobject;
-			JSONArray array = object2.getJSONArray(KEY.KEY_STATIONITEM);
+			JSONArray array = object2.getJSONArray(KEY.KEY_DEVICEITEM);
 			Log.d(TAG, "getIDInfo object ");
 			for (int i = 0; i < array.length(); i++) {
 				Log.d(TAG, "getIDInfo object i =" + i);
-				JSONObject subObject = array.getJSONObject(i);
-				if (subObject.getString("Index").equals("5")) {
-					// list.add(subObject);
-					Log.d(TAG, "getIDInfo object index is 5");
+				JSONObject subObject = array.getJSONObject(i);				
 					JSONArray sub_Array = subObject.getJSONArray(KEY.KEY_IDINFO);
 					for (int k = 0; k < sub_Array.length(); k++) {
 						list.add(sub_Array.getJSONObject(k));
 						Log.d(TAG, "getIDInfo object k =" + k);
-					}
-				}
+					}				
 			}
 
 		} catch (Exception e) {
@@ -625,30 +556,7 @@ public class MyJSONParse {
 	}
 
 	
-	public List<String>getDeviceItemDefList(Object deviceItemObject) throws JSONException{
-		if(deviceItemObject == null){
-			Log.e(TAG, "getDeviceItemDefList deviceItemObject is null");
-			return null;
-		}
-		List<String> list = new ArrayList<String>();
-		
-		//
-		JSONObject object = (JSONObject) deviceItemObject;
-		String str = (String) object.get(KEY.KEY_ITEMDEF);
-		
-		if(str == null){
-			Log.e(TAG, "getDeviceItemDefList str is null");
-			return null;
-		}
-		String[] splitStr = str.split("\\/");
-		Log.d(TAG, " getDeviceItemDefList splitStr size is  =" +splitStr.length+","+str);
-		for(int i =0 ;i<splitStr.length;i++){			
-			list.add(splitStr[i].toString());
-			Log.d(TAG, " getDeviceItemDefList test i =" + i +","+splitStr[i]);
-		}
-		
-		return list;
-	}
+	
 	// input params must be DeviceItem sub
 	public String getDeviceItemName(Object DeviceItemobject) {
 		if (DeviceItemobject == null)
@@ -656,7 +564,7 @@ public class MyJSONParse {
 		String name = null;
 		try {
 			JSONObject newObject = (JSONObject) DeviceItemobject;
-			name = newObject.getString("DeviceName");
+			name = newObject.getString("Name");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -675,23 +583,15 @@ public class MyJSONParse {
 		List<Object> list = null;
 		for (int i = 0; i < mRouteList.get(mRouteIndex).mStationList.size(); i++) {
 			object = (JSONObject) mRouteList.get(mRouteIndex).mStationList.get(i);
-			list = getIDInfo(object);
+			//list = getIDInfo(object);
+			String codes = object.optString("Code");
+			if(codes.contains(strIdCode)){
+				index = i;
+				break;
+			}
 			Log.d(TAG, "getStationItemIndexByID i = " + i + ",object is "
 					+ object.toString());
-			if (list != null) {
-				for (int j = 0; j < list.size(); j++) {
-					object = (JSONObject) list.get(j);
-					Log.d(TAG, "getStationItemIndexByID j is " + j
-							+ ",object is " + object.toString());
-					String idnumber = (String) object.get(KEY.KEY_IDNUMBER);
-					if (strIdCode.equals(idnumber)) {
-						index = i;
-						break;
-					}
-				}
-			} else {
-				Log.d(TAG, "getStationItemIndexByID list is null");
-			}
+			
 		}
 		return index;
 	}
@@ -730,10 +630,10 @@ public class MyJSONParse {
 				//Log.d(TAG, "getPartItemName 3");
 				name = newObject.getString(KEY.KEY_PARTITEMDATA);
 				String nameArray[] = name.split("\\*");
-				if((nameArray.length == 10) &&(index == CommonDef.partItemData_Index.PARTITEM_ADDITIONAL_INFO_NAME)){
-					name = null;
+				if((nameArray.length <20) ){
+					name = getPartItemSubStr(name,index);
 				}else{
-				name = getPartItemSubStr(name,index);
+					Log.d(TAG, "getPartItemCheckUnitName() has checked ");
 				}
 				//Log.d(TAG, "getPartItemName 4");
 
@@ -744,36 +644,7 @@ public class MyJSONParse {
 			return name;
 		}	
 	
-	/*
-	 * input: index is itemDef index from left to right ,start from 0,that is
-	 * combox widget index input:object is deviceItem intent is to get itemDef
-	 */	
-	public List<Object> getPartItemListByItemDef(Object partItemobject, int index)
-			throws JSONException {
-		List<Object> list = new ArrayList<Object>();
-
-		if (partItemobject == null) {
-			Log.e(TAG, " getPartItemListByItemDef input param object is null");
-			return null;
-		}
-		Log.e(TAG, " getPartItemListByItemDef ,"+partItemobject.toString());
-		JSONArray array = ((JSONObject) partItemobject).getJSONArray(KEY.KEY_PARTITEM);
-		Log.e(TAG, " getPartItemListByItemDef array size is "+array.length()); 
-		for (int i = 0; i < array.length(); i++) {
-			JSONObject subObject = (JSONObject) array.get(i);
-			String substr = getPartItemName(subObject);
-			String str2 = getPartItemSubStr(substr, ITEMDEF_INDEX);
-			
-			int value = Integer.parseInt(str2);
-			int btrue = ((value >> index) & 1);
-			Log.d(TAG, " getPartItemListByItemDef str2 is "+str2 + "value =" +value + ",btrue ="+btrue);
-			if (btrue != 0) {
-				Log.d(TAG, " getPartItemListByItemDef array.get(i) is "+array.get(i));				
-				list.add(array.get(i));
-			}
-		}
-		return list;
-	}
+	
 	
 	// input params must be DeviceItem sub
 	//入参：JSON 节点的DeviceItem 下一目录节点
@@ -826,46 +697,35 @@ public class MyJSONParse {
 		return name;
 	}
 
-	public List<Object> getWorkerInfoItem(int routeIndex) throws JSONException {
-		if (mRouteList.get(mRouteIndex).mWorkerInfo_Root_Object == null)
-			return null;
-		if (mRouteList.get(mRouteIndex).mWorkerList != null)
-			return mRouteList.get(mRouteIndex).mWorkerList;
-		mRouteList.get(mRouteIndex).mWorkerList = new ArrayList<Object>();
-		try {
-			JSONObject object = (JSONObject) mRouteList.get(mRouteIndex).mWorkerInfo_Root_Object;
 
-			JSONArray array = object.getJSONArray("WorkerInfo");
 
-			for (int i = 0; i < array.length(); i++) {
-
-				mRouteList.get(mRouteIndex).mWorkerList.add(array.getJSONObject(i));
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return mRouteList.get(mRouteIndex).mWorkerList;
-	}
-
-public static List<WorkerInfo> parseWorkerNode(Object WorkerObject) throws JSONException {
+	/**
+	 * 解析工人信息
+	 * @param WorkerObject
+	 * @return
+	 * @throws JSONException
+	 */
+public static List<WorkerInfo> parseWorkerNode(JSONArray WorkerObject) throws JSONException {
 		
 		if(WorkerObject == null) return null;
 		
 		List<WorkerInfo> workerList = new ArrayList<WorkerInfo>();
 		
-		JSONArray jsonArray = ((JSONObject)WorkerObject).getJSONArray("WorkerInfo");
+		JSONArray jsonArray = WorkerObject;
 		
 		for(int i =0 ;i<jsonArray.length();i++){
 			JSONObject jsonObject = (JSONObject) jsonArray.get(i);			
 			WorkerInfo info = new WorkerInfo();
-			info.GroupName = jsonObject.getString("GroupName");
-			info.WorkerName = jsonObject.getString("WorkerName");
-			info.WorkerNumber = jsonObject.getString("WorkerNumber");
-			info.WorkerPwd = jsonObject.getString("WorkerPwd");
-			info.isAdministrator = Integer.valueOf(jsonObject.getString("Adminstrator")) == 1;
+			info.Alias_Name = jsonObject.getString(T_Worker.Worker_Const.Key_Alias_Name);
+			info.Class_Group = jsonObject.optString(T_Worker.Worker_Const.Key_Class_Group);
+			info.Mumber = jsonObject.getString(T_Worker.Worker_Const.Key_Mumber);
+			info.Name = jsonObject.getString(T_Worker.Worker_Const.Key_Name);
+			info.T_Line_Content_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Content_Guid);
+			info.T_Line_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Guid);
+			
+			info.T_Organization_R_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Organization_R_Guid);
 			workerList.add(info);
-			Log.d("luotest","parseWorkerNode()info "+info.GroupName);
+			//Log.d("luotest","parseWorkerNode()info "+info.GroupName);
 			
 			
 		}	
@@ -873,35 +733,39 @@ public static List<WorkerInfo> parseWorkerNode(Object WorkerObject) throws JSONE
 		return workerList;
 	}
 	
-public static Route.info parseRouteNameNode(Object RouteNameObject) throws JSONException {
+public static LineInfo parseRouteNameNode(Object RouteNameObject) throws JSONException {
 		
 		if(RouteNameObject == null) return null;
 		
 
-		Route rout = new Route();
-		Route.info infor = rout.new info();		
-		infor.PlanName = ((JSONObject)RouteNameObject).getString("PlanName");
-		infor.PlanGuid = ((JSONObject)RouteNameObject).getString("PlanGuid");		
-		return infor;
+		LineInfo rout = new LineInfo();
+		
+		rout.Name = ((JSONObject)RouteNameObject).getString(T_Line.Line_Const.Key_Name);
+		rout.T_Content_Guid = ((JSONObject)RouteNameObject).getString(T_Line.Line_Const.Key_T_Content_Guid);
+		rout.T_Line_Guid = ((JSONObject)RouteNameObject).getString(T_Line.Line_Const.Key_T_Line_Guid);
+			
+		return rout;
 	}
 
-public static List<TurnInfo> parseTurnNode(Object TurnObject) throws JSONException {
+public static List<TurnInfo> parseTurnNode(JSONArray TurnObject) throws JSONException {
 	
 	if(TurnObject == null) return null;
 
 	List<TurnInfo> list = new ArrayList<TurnInfo>();
 	try {
-		JSONObject object = (JSONObject)TurnObject;
-
-		JSONArray array = object.getJSONArray("TurnInfo");
+		JSONArray array = TurnObject;
 
 		for (int i = 0; i < array.length(); i++) {
 			TurnInfo info = new TurnInfo();
-			//mRouteList.get(mRouteIndex).mTurnList.add(array.getJSONObject(i));
-			info.Number=((JSONObject)array.get(i)).getString("Number");
-			info.StartTime=((JSONObject)array.get(i)).getString("StartTime");
-			info.EndTime=((JSONObject)array.get(i)).getString("EndTime");
-			info.DutyNumber=((JSONObject)array.get(i)).getString("DutyNumber");					
+			
+			info.End_Time=((JSONObject)array.get(i)).getString(T_Turn.Turn_Const.Key_End_Time);
+			info.Name=((JSONObject)array.get(i)).optString(T_Turn.Turn_Const.Key_Name);
+			info.Number=((JSONObject)array.get(i)).getString(T_Turn.Turn_Const.Key_Number);
+			info.Start_Time=((JSONObject)array.get(i)).getString(T_Turn.Turn_Const.Key_Start_Time);
+			info.T_Line_Content_Guid=((JSONObject)array.get(i)).getString(T_Turn.Turn_Const.Key_T_Line_Content_Guid);
+			info.T_Line_Guid=((JSONObject)array.get(i)).getString(T_Turn.Turn_Const.Key_T_Line_Guid);
+			
+						
 			list.add(info);
 
 		}
@@ -914,30 +778,13 @@ public static List<TurnInfo> parseTurnNode(Object TurnObject) throws JSONExcepti
 }
 	
 	public List<TurnInfo> getTurnInfoItem(int routeIndex) throws JSONException {
-		if (mRouteList.get(mRouteIndex).mTurnInfo_Root_Object == null)
+		if (mRouteList.get(mRouteIndex).mTurnList == null){
 			return null;
-
-		if (mRouteList.get(mRouteIndex).TurnInfoList != null)
-			return mRouteList.get(mRouteIndex).TurnInfoList;
-
-		mRouteList.get(mRouteIndex).TurnInfoList = new ArrayList<TurnInfo>();
-		try {
-			JSONObject object = (JSONObject) mRouteList.get(mRouteIndex).mTurnInfo_Root_Object;
-
-			JSONArray array = object.getJSONArray("TurnInfo");
-
-			for (int i = 0; i < array.length(); i++) {
-				TurnInfo info = new TurnInfo();
-				info.Number=((JSONObject)array.get(i)).getString("Number");
-				info.StartTime=((JSONObject)array.get(i)).getString("StartTime");
-				info.EndTime=((JSONObject)array.get(i)).getString("EndTime");
-				info.DutyNumber=((JSONObject)array.get(i)).getString("DutyNumber");					
-				mRouteList.get(mRouteIndex).TurnInfoList.add(info);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		}else{
+			return mRouteList.get(mRouteIndex).mTurnList ;
 		}
-		return mRouteList.get(mRouteIndex).TurnInfoList;
+
+		
 	}
 
 	public Object getStationItem(int routeIndex,int index) {

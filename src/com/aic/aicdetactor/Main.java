@@ -83,26 +83,26 @@ public class Main extends Activity implements OnClickListener,LoginListener,Blue
 				}
 					break;
 				case R.id.btnD://通知
-					{	
+					{	if(mIsLogin){	
 						FragmentManager fragmentManager = getFragmentManager();
 						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 						Fragment fragment = new Message_Fragment();
 						fragmentTransaction.replace(R.id.fragment_main,fragment);			
 						fragmentTransaction.commit();
+					}else{
+						Toast.makeText(getApplicationContext(), "通知：您还没登录", Toast.LENGTH_LONG).show();
+						initFragment();
+					}
 					}
 					break;
 				case R.id.btnE://云端
-					if(mIsLogin){	
-						FragmentManager fragmentManager = getFragmentManager();
-						FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-						Fragment fragment = new DownLoadFragment();
-						fragmentTransaction.replace(R.id.fragment_main,fragment);			
-						fragmentTransaction.commit();
-						
-						}else{
-							Toast.makeText(getApplicationContext(), "云端：您还没登录", Toast.LENGTH_LONG).show();
-							initFragment();
-						}
+				{
+					FragmentManager fragmentManager = getFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+					Fragment fragment = new DownLoadFragment();
+					fragmentTransaction.replace(R.id.fragment_main,fragment);			
+					fragmentTransaction.commit();
+				}
 					
 					break;
 				}
@@ -135,7 +135,7 @@ public class Main extends Activity implements OnClickListener,LoginListener,Blue
 	String TAG = "luotest";
 	
 	@Override
-	public void Click(boolean logIn,String Name,String pwd) {
+	public void Click(boolean logIn,String Name,String pwd,String error) {
 		// TODO Auto-generated method stub
 		if(logIn){
 			mIsLogin = true;
@@ -155,7 +155,8 @@ public class Main extends Activity implements OnClickListener,LoginListener,Blue
 			fragmentTransaction.commit();
 			
 		}else{
-			Toast.makeText(this.getApplicationContext(), "用户名或密码有误，请再次确认重试！", Toast.LENGTH_LONG).show();	
+			Toast.makeText(this.getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();	
+//			Toast.makeText(this.getApplicationContext(), "用户名或密码有误，请再次确认重试！", Toast.LENGTH_LONG).show();	
 		}
 	}
 	@Override

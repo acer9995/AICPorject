@@ -1,6 +1,5 @@
 package com.aic.aicdetactor.check;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -21,11 +19,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
@@ -42,7 +37,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -53,14 +47,12 @@ import com.aic.aicdetactor.app.myApplication;
 import com.aic.aicdetactor.comm.CommonDef;
 import com.aic.aicdetactor.comm.PartItem_Contact;
 import com.aic.aicdetactor.data.AuxiliaryInfoNode;
-import com.aic.aicdetactor.data.Temperature;
 import com.aic.aicdetactor.fragment.Observer_fragment;
 import com.aic.aicdetactor.fragment.Observer_fragment.OnMediakListener;
 import com.aic.aicdetactor.fragment.Temperature_fragment;
 import com.aic.aicdetactor.fragment.Temperature_fragment.OnMeasureListener;
 import com.aic.aicdetactor.fragment.Vibrate_fragment;
 import com.aic.aicdetactor.fragment.Vibrate_fragment.OnVibateListener;
-import com.aic.aicdetactor.media.MediaMainActivity;
 import com.aic.aicdetactor.media.NotepadActivity;
 import com.aic.aicdetactor.media.SoundRecordActivity;
 import com.aic.aicdetactor.util.SystemUtil;
@@ -300,7 +292,7 @@ public class PartItemActivity extends FragmentActivity implements OnClickListene
 		   mCurrentDeviceObject = deviceItemList.get(mDeviceIndex);
 		 //  mDeviceQueryNameStr =   ((myApplication) getApplication()).getDeviceQueryNumber(mCurrentDeviceObject);
 		   Log.d(TAG, "mCurrentDeviceObject IS " + mCurrentDeviceObject.toString());
-		   mPartItemSelectedList = ((myApplication) getApplication()).getPartItemListByItemDef(partItemObject,itemIndex);
+		   mPartItemSelectedList = ((myApplication) getApplication()).getPartItem(partItemObject);
 			
 		   
 		  

@@ -1,9 +1,12 @@
 package com.aic.aicdetactor.fragment;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import com.aic.aicdetactor.R;
 import com.aic.aicdetactor.TestSetting;
 import com.aic.aicdetactor.app.myApplication;
+
 import com.aic.aicdetactor.database.RouteDao;
 import com.aic.aicdetactor.util.SystemUtil;
 
@@ -27,10 +31,12 @@ public class LoginFragment extends Fragment implements OnClickListener{
 	private LoginListener mCallBack = null;
 	private String mLogName=null;
 	private String mLogPwd = null;
+	private String error= null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		
 	}
 
 	@Override
@@ -55,16 +61,17 @@ public class LoginFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onClick(View arg0) {
+		
 		// TODO Auto-generated method stub
 		switch(arg0.getId()){
 		case R.id.login:
-			mCallBack.Click(Login(),mLogName,mLogPwd);
+			mCallBack.Click(Login(),mLogName,mLogPwd,error);
 			break;
 		}
 	}
 	
 	public interface LoginListener{
-		void Click(boolean logIn,String Name,String pwd);
+		void Click(boolean logIn,String Name,String pwd,String error);
 	}
 	
 	@Override
@@ -98,7 +105,10 @@ public class LoginFragment extends Fragment implements OnClickListener{
 			}
 		} 
 		RouteDao dao = new RouteDao(this.getActivity().getApplicationContext());
-	List<String>fileList = 	dao.queryLogIn(mLogName, mLogPwd);
+		ContentValues cv = new ContentValues();
+		List<String>fileList = 	dao.queryLogIn(mLogName, mLogPwd,cv);
+		error=cv.getAsString("error");
+	Log.d(TAG," Login() error = "+ cv.get("error"));
 	
 	if(fileList.size()>0){	
 		return true;

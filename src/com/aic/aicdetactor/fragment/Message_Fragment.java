@@ -31,6 +31,7 @@ import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 public class Message_Fragment extends Fragment {
 	ListView mListView = null;
@@ -111,7 +112,13 @@ public class Message_Fragment extends Fragment {
 	 * 默认查询未读的消息
 	 */
 	void initData(int type){
-		
+		if(((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerName == null
+				&&((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerNumber ==null
+				){
+			Toast.makeText(this.getActivity(), "您还没登录", Toast.LENGTH_SHORT).show();
+			return;
+			
+		}
 		TemporaryRouteDao info = new TemporaryRouteDao(this.getActivity().getApplicationContext());
 		
 		 List<TemporaryDataBean>  list=		info.queryTemporaryInfoList(type,

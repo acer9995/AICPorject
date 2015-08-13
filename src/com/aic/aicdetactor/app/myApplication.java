@@ -5,21 +5,11 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import android.app.Application;
+import android.content.ContentValues;
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 import com.aic.aicdetactor.data.CheckStatus;
 import com.aic.aicdetactor.data.MyJSONParse;
@@ -27,11 +17,6 @@ import com.aic.aicdetactor.data.Temperature;
 import com.aic.aicdetactor.data.TurnInfo;
 import com.aic.aicdetactor.database.RouteDao;
 import com.aic.aicdetactor.util.SystemUtil;
-
-import android.app.Application;
-import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
 
 public class myApplication extends Application
 {
@@ -95,7 +80,8 @@ public class myApplication extends Application
     	mWorkerName = name;
     	mWorkerPwd = pwsd;
     	dao = new RouteDao(this.getApplicationContext());
-		mFileList = dao.queryLogIn(mWorkerName, mWorkerPwd);
+    	ContentValues cv = new ContentValues();
+    	mFileList = dao.queryLogIn(mWorkerName, mWorkerPwd,cv);
 		for (int i = 0; i < mFileList.size(); i++) {
 			insertNewRouteInfo(SystemUtil.createGUID(), mFileList.get(i), this);
 			Log.d(TAG,"setUserInfo() i=" + i + ","+ mFileList.get(i));
@@ -208,9 +194,7 @@ public class myApplication extends Application
      return 	object;
     }
     
-    public List<String>getDeviceItemDefList(Object deviceItemObject) throws JSONException{
-    	 return 	json.getDeviceItemDefList(deviceItemObject);
-    }
+   
     public String getDeviceItemName(Object object) {
     	return json.getDeviceItemName(object);
     }
@@ -229,9 +213,7 @@ public class myApplication extends Application
     public String getPartItemSubStr(String partItemDataStr,int index){
     	return json.getPartItemSubStr(partItemDataStr,index);
     }
-    public List<Object> getPartItemListByItemDef(Object partItemobject ,int index) throws JSONException{
-    	return json.getPartItemListByItemDef(partItemobject,index);
-    }
+  
     public String getRoutName(int routeIndex) throws JSONException{
     	return json.getRoutName(routeIndex);
     }
@@ -239,9 +221,7 @@ public class myApplication extends Application
     public Temperature getPartItemTemperatrue(Object object){
     	return json.getPartItemTemperatrue(object);
     }   
-    public String getDeviceQueryNumber(Object object){
-    	return json.getDeviceQueryNumber(object);
-    }
+   
     public void SaveData(int RouteIndex,String fileName){
     	 json.SaveData(RouteIndex,fileName);
     }
@@ -251,6 +231,9 @@ public class myApplication extends Application
     
     public List<TurnInfo>getRouteTurnInfoList() throws JSONException{
     	return json.getTurnInfoItem(mRouteIndex);
+    }
+    public List<Object>getPartItem(Object object){
+    	return json.getPartItem(object);
     }
 
 }

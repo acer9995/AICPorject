@@ -14,24 +14,13 @@ public class DBHelper extends SQLiteOpenHelper {
 	//保存从服务器接收到的原始巡检数据信息
 	// public static String TABLE_SOURCE_FILE = "jxcheck";
 	 public static String TABLE_SOURCE_FILE = "T_Original_Json_File";
-	 public class SourceTable{
-	 public static final String GUID="guid";
-	 public static final String JXNAME="jxName";
-	 public static final String PATH="filePath";//文件的全路径
-	 public static final String DOWNTIME="downTime";
-	 public static final String ISBEIGINCHECKED="isBeiginChecked";
-	 public static final String ISCHECKED="isChecked";
-	 public static final String ISUPLOADED="isuploaded";
-	 public static final String LASTCHECKTIME="lastcheckTime";
-	 public static final String WORKERNAME="workerName";
-	 public static final String FIRSTCHECKTIME="firstcheckTime";
-	 public static final String LASTCHECKSTATION="lastCheckStation";
-	 public static final String LASTCHECKDEVICE_INDEX="lastCheckDeviceIndex";
-	 public static final String LASTCHECKPARTITEM_INDEX="lastCheckPartItemIndex";
-	 public static final String ISREVERSE_CHECK="isReverseCheck";
-	 
+	 public class SourceTable{	 
+	 //巡检名称，在ListView 中显示的巡检路径名称
 	 public static final String PLANNAME="T_Line_Name";
+	 //巡检GUID,同时是JSON的文件名称
 	 public static final String PLANGUID="T_Line_Guid";
+	//文件的存储路径
+	 public static final String Path ="Path";
 	 
 	 }
 
@@ -59,21 +48,22 @@ public class DBHelper extends SQLiteOpenHelper {
 	 
 	 public static String TABLE_WORKERS = "workers";
 	 public class Plan_Worker_Table{
-		 public static final String  Name = "Name";
-		 public static final String Number = "Number";
-		 public static final String Password = "password";
-		 public static final String IsAdministrator = "IsAdministrator";
-		 public static final String PlanGuid = "PlanGuid";
-		 public static final String GroupName = "GroupName";
+		public static final   String Alias_Name = "Alias_Name";
+		public static final   String Class_Group  = "Class_Group";
+		public static final   String Mumber  = "Mumber";
+		public static final   String Name  ="Name";
+		public static final   String T_Line_Content_Guid ="T_Line_Content_Guid";
+		public static final   String T_Line_Guid ="T_Line_Guid";
+		public static final   String T_Organization_Guid  ="T_Organization_Guid";
 	 }
 	 public static String TABLE_TURN = "TurnInfo";
 	 public class Plan_Turn_Table{
-		 public static final String  Number = "Number";
-		 public static final String  StartTime = "StartTime";
-		 public static final String EndTime = "EndTime";
-		 public static final String PlanGuid = "PlanGuid";
-		 public static final String DutyNumber = "DutyNumber";
-		 
+		public static final String End_Time = "End_Time";
+		public static final String Name = "Name";
+		public static final String Number = "Number";
+		public static final String Start_Time ="Start_Time";
+		public static final String T_Line_Guid ="T_Line_Guid";
+		public static final String T_Line_Content_Guid ="T_Line_Content_Guid";
 		
 	 }
 	 
@@ -154,18 +144,9 @@ public class DBHelper extends SQLiteOpenHelper {
 		//save file that from server
 		String jxchecksql = "create table IF NOT EXISTS "+TABLE_SOURCE_FILE
 				+"("
-				+ "guid varchar(64)," + "jxName varchar(128),"
-				+ "filePath varchar(128)," + "downTime varchar(24),"
-				+ "isBeiginChecked BOOLEAN," + "isChecked BOOLEAN,"
-				+ "isuploaded BOOLEAN," + "lastcheckTime varchar(24),"
-				+ "workerName varchar(128)," + "firstcheckTime varchar(24),"
-				+ "lastCheckStation varchar(8),"
-				+ "lastCheckDeviceIndex varchar(8),"
-				+ "lastCheckPartItemIndex varchar(8),"
-				+ "isReverseCheck BOOLEAN,"
+				+ SourceTable.Path +" varchar(256),"
 				+ SourceTable.PLANNAME +" varchar(256),"
-				+  SourceTable.PLANGUID + " varchar(256) PRIMARY KEY"
-				//+ "PRIMARY KEY ("+SourceTable.PLANGUID +")"
+				+  SourceTable.PLANGUID + " varchar(256) PRIMARY KEY"				
 				+")";
 
 		db.execSQL(jxchecksql);
@@ -197,12 +178,12 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ TABLE_WORKERS 
 				+ "(" 
 				+ Plan_Worker_Table.Name+" varchar(256),"
-				+ Plan_Worker_Table.Number+" varchar(256) PRIMARY KEY," 
-				+ Plan_Worker_Table.Password +" varchar,"
-				+ Plan_Worker_Table.IsAdministrator +" BOOLEAN,"
-				+ Plan_Worker_Table.PlanGuid + " varchar(256),"
-				+ Plan_Worker_Table.GroupName + " varchar(128)"
-				//+ "PRIMARY KEY ( " +Plan_Worker_Table.Number +")"
+				+ Plan_Worker_Table.Alias_Name+" varchar(256)," 
+				+ Plan_Worker_Table.Class_Group +" varchar,"
+				+ Plan_Worker_Table.Mumber +" varchar,"
+				+ Plan_Worker_Table.T_Line_Content_Guid + " varchar(256),"
+				+ Plan_Worker_Table.T_Line_Guid + " varchar(128),"
+				+ Plan_Worker_Table.T_Organization_Guid + " varchar(256)"				
 				+")";
 
 		db.execSQL(workerSql);
@@ -239,10 +220,12 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ TABLE_TURN 
 				+ "(" 
 				+ Plan_Turn_Table.Number+" varchar(256),"
-				+ Plan_Turn_Table.StartTime+" varchar(16)," 
-				+ Plan_Turn_Table.EndTime +" varchar(16),"
-				+ Plan_Turn_Table.DutyNumber +" varchar(8),"
-				+ Plan_Turn_Table.PlanGuid + " varchar(256)"				
+				+ Plan_Turn_Table.End_Time+" varchar(16)," 
+				+ Plan_Turn_Table.Name +" varchar(16),"
+				+ Plan_Turn_Table.Start_Time +" varchar(8),"
+				+ Plan_Turn_Table.T_Line_Content_Guid + " varchar(256),"
+				+ Plan_Turn_Table.T_Line_Guid +" varchar(16)"
+				
 				+")";
 
 		db.execSQL(turnSql);

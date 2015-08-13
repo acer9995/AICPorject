@@ -133,7 +133,7 @@ public class StationActivity extends Activity {
 				// //test idinfo ,test pass
 				int myid = 100;
 				String teststr = "AIC8E791D89B";
-				teststr = "AIC8D7D1E09C";
+				teststr = "AIC8C78BD09B";
 				try {
 					myid = ((myApplication) getApplication())
 							.getStationItemIndexByID(0,teststr);

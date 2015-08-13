@@ -6,7 +6,7 @@
    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:id="@+id/msg_linear1"
+        android:id="@+id/dwonup_linear1"
         android:layout_marginTop="30dp">"
         
 		 <RadioGroup
@@ -67,7 +67,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/textView3"
+		           android:id="@+id/textView_up_ip"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		         
@@ -88,7 +88,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/textView5"
+		           android:id="@+id/textView_up_pda_code"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -108,7 +108,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/textView7"
+		           android:id="@+id/textView_up_pda_ip"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -128,7 +128,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/textView9"
+		           android:id="@+id/textView_up_pda_mac"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -141,7 +141,7 @@
 	       android:orientation="horizontal"
 	       android:layout_marginLeft="40dp">		     
 		     <CheckBox
-		           android:id="@+id/checkbox1"
+		           android:id="@+id/checkbox_up_auto_up"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		           android:text="@string/up_auto_up"
@@ -253,7 +253,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/down_textView3"
+		           android:id="@+id/textView_down_service_ip"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		         
@@ -274,7 +274,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/down_textView5"
+		           android:id="@+id/textView_down_pda_code"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -294,7 +294,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/down_textView7"
+		           android:id="@+id/textView_down_pda_ip"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -314,7 +314,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/down_textView9"
+		           android:id="@+id/textView_down_pda_mac"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          
@@ -413,7 +413,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/setting_textView3"
+		           android:id="@+id/textView_setting_service_ip"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		         
@@ -434,7 +434,7 @@
 		           android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 		     <TextView
-		           android:id="@+id/setting_textView5"
+		           android:id="@+id/textView_setting_pda_code"
 		           android:layout_width="wrap_content"
 		           android:layout_height="wrap_content"
 		          

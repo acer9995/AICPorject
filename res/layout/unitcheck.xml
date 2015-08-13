@@ -16,6 +16,12 @@
 	    android:layout_height="wrap_content"
 	    android:layout_gravity="bottom|center">
 
+	    <Button
+		    android:id="@+id/bottombutton_pre"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="@string/pre_item" />
+	    
 		<Button
 		    android:id="@+id/bottombutton1"
 		    android:layout_width="wrap_content"

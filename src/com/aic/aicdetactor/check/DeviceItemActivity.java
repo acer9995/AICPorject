@@ -100,7 +100,7 @@ public class DeviceItemActivity extends Activity implements OnClickListener {
 	
 	private JSONArray mJSONArray = null;
 	private String mDeviceNameStr= null;
-	private String mDeviceQueryNameStr = null;
+	
 	private String mDeviceItemDefStr = null;
 	private boolean []mBValue = null;
 	@Override
@@ -247,7 +247,7 @@ Log.d(TAG,"routeName is "+ routeNameStr);
 		mSpinner = (Spinner) findViewById(R.id.spinner1);
 		mItemDefTextView = (TextView)findViewById(R.id.status);
 		initSpinnerData();
-		if(bSpinnerVisible){		
+		if(spinnerList!= null &&bSpinnerVisible){		
 			spinnerAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinnerList);    
 	        //第三步：为适配器设置下拉列表下拉时的菜单样式。    
 			spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);    
@@ -318,18 +318,18 @@ Log.d(TAG,"routeName is "+ routeNameStr);
 	}
 
 	void initSpinnerData(){
-		try {
-			spinnerList = ((myApplication) getApplication()).getDeviceItemDefList(partItemObject);
-			if(spinnerList.size()<=1){
+		//try {
+			spinnerList = null;//((myApplication) getApplication()).getDeviceItemDefList(partItemObject);
+			if(spinnerList!= null &&spinnerList.size()<=1){
 				bSpinnerVisible= false;
 				mSpinner.setVisibility(Spinner.GONE);
 				mItemDefTextView.setVisibility(TextView.VISIBLE);
 				mItemDefTextView.setText(spinnerList.get(0));
 			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		if(spinnerAdapter != null){
 		spinnerAdapter.notifyDataSetChanged();
 		}
@@ -387,9 +387,7 @@ Log.d(TAG,"routeName is "+ routeNameStr);
 		   List<Object> deviceItemList = ((myApplication) getApplication()).getDeviceItemList(mStationIndex);
 		   
 		   mCurrentDeviceObject = deviceItemList.get(mDeviceIndex);
-		   mDeviceQueryNameStr =   ((myApplication) getApplication()).getDeviceQueryNumber(mCurrentDeviceObject);
-		   Log.d(TAG, "mCurrentDeviceObject IS " + mCurrentDeviceObject.toString());
-		   mPartItemSelectedList = ((myApplication) getApplication()).getPartItemListByItemDef(partItemObject,itemIndex);
+		   mPartItemSelectedList = ((myApplication) getApplication()).getPartItem(partItemObject);
 			
 		   if(updateAdapter){
 			   mMapList.clear();
@@ -403,7 +401,7 @@ Log.d(TAG,"routeName is "+ routeNameStr);
 			for (int i = 0; i < mPartItemSelectedList.size(); i++) {
 				Map<String, Object> map = new HashMap<String, Object>();				
 				map.put(CommonDef.check_item_info.UNIT_NAME, ((myApplication) getApplication())
-						.getPartItemCheckUnitName(mPartItemSelectedList.get(i),CommonDef.partItemData_Index.PARTITEM_UNIT_NAME));
+						.getPartItemCheckUnitName(mPartItemSelectedList.get(i),CommonDef.partItemData_Index.PARTITEM_TURN_NAME));
 				//checkname
 				map.put(CommonDef.check_item_info.NAME, ((myApplication) getApplication())
 						.getPartItemCheckUnitName(mPartItemSelectedList.get(i),CommonDef.partItemData_Index.PARTITEM_CHECKPOINT_NAME));
