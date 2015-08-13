@@ -106,7 +106,7 @@ public class RouteDao {
 						workerinfo.Mumber,
 						workerinfo.T_Line_Content_Guid,		
 						workerinfo.T_Line_Guid,
-						workerinfo.T_Organization_R_Guid});
+						workerinfo.T_Organization_Guid});
 				}
 			if(cursor != null){cursor.close();}
 		}

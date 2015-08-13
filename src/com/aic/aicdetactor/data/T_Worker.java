@@ -33,6 +33,6 @@ public static final String RootNodeName="T_Worker";
 		public static final   String Key_Name  ="Name";
 		public static final   String Key_T_Line_Content_Guid ="T_Line_Content_Guid";
 		public static final   String Key_T_Line_Guid ="T_Line_Guid";
-		public static final   String Key_T_Organization_R_Guid  ="T_Organization_R_Guid";
+		public static final   String Key_T_Organization_Guid  ="T_Organization_Guid";
 		}
 }

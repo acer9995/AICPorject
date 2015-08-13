@@ -149,7 +149,7 @@ public class MyJSONParse {
 				
 				route.mGloableObject = object.getJSONObject(GlobalInfo.NodeName);
 				route.mLineObject = object.getJSONObject(T_Line.RootNodeName);
-				route.mStationArrary= (JSONArray) object.getJSONArray("StationInfo");
+				route.mStationArrary= (JSONArray) object.getJSONArray(KEY.KEY_STATIONINFO);
 				route.mTurnArrary= (JSONArray) object.getJSONArray(T_Turn.RootNodeName);
 				route.mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
 				JSONObject sub_object = object.getJSONObject(T_Period.RootNodeName);
@@ -207,7 +207,7 @@ public class MyJSONParse {
 				
 				mRouteList.get(routeIndex).mGloableObject = object.getJSONObject(GlobalInfo.NodeName);
 				mRouteList.get(routeIndex).mLineObject =object.getJSONObject(T_Line.RootNodeName);
-				mRouteList.get(routeIndex).mStationArrary= (JSONArray) object.getJSONArray("StationInfos");
+				mRouteList.get(routeIndex).mStationArrary= (JSONArray) object.getJSONArray(KEY.KEY_STATIONINFO);
 				mRouteList.get(routeIndex).mTurnArrary= (JSONArray) object.getJSONArray(T_Turn.RootNodeName);
 				mRouteList.get(routeIndex).mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
 				
@@ -723,7 +723,7 @@ public static List<WorkerInfo> parseWorkerNode(JSONArray WorkerObject) throws JS
 			info.T_Line_Content_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Content_Guid);
 			info.T_Line_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Guid);
 			
-			info.T_Organization_R_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Organization_R_Guid);
+			info.T_Organization_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Organization_Guid);
 			workerList.add(info);
 			//Log.d("luotest","parseWorkerNode()info "+info.GroupName);
 			
