@@ -267,20 +267,21 @@ public class btwifi_setting_activity  extends Activity  implements OnClickListen
  				map.put(mBtName, device.getName());
 				map.put(mBtAddress, device.getAddress());
 				Log.d(TAG,"UUID is "+	device.getUuids());
-//				if(mList_bt.size()>0){
-//				for(int i =0;i<mList_bt.size();i++){
-//					Map<String, Object> temp = mList_bt.get(i);
-//					if(temp.get(mBtName).equals(device.getName())
-//							&& temp.get(mBtAddress).equals(device.getAddress())){
-//					}else{
-//						mList_bt.add(map); 				
-//						mAdapter_bt.notifyDataSetChanged();
-//					}
-//				}	
-//				}else{
-//					mList_bt.add(map); 				
-//					mAdapter_bt.notifyDataSetChanged();
-//				}	
+				if(mList_bt.size()>0){
+				for(int i =0;i<mList_bt.size();i++){
+					Map<String, Object> temp = mList_bt.get(i);
+					if(temp.get(mBtName).equals(device.getName())
+							&& temp.get(mBtAddress).equals(device.getAddress())){
+					}else{
+						mList_bt.add(map); 				
+						mAdapter_bt.notifyDataSetChanged();
+					}
+				}	
+				}else{
+					mList_bt.add(map); 				
+					mAdapter_bt.notifyDataSetChanged();
+				}	
+			
 				mList_bt.add(map); 				
 				mAdapter_bt.notifyDataSetChanged();
 				mListView_bt.setVisibility(View.VISIBLE);

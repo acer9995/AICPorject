@@ -29,7 +29,7 @@ public static final String RootNodeName="T_Worker";
 	public class Worker_Const{		
 		public static final   String Key_Alias_Name = "Alias_Name";
 		public static final   String Key_Class_Group  = "Class_Group";
-		public static final   String Key_Mumber  = "Mumber";
+		public static final   String Key_Number  = "Number";
 		public static final   String Key_Name  ="Name";
 		public static final   String Key_T_Line_Content_Guid ="T_Line_Content_Guid";
 		public static final   String Key_T_Line_Guid ="T_Line_Guid";

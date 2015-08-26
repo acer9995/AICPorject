@@ -7,7 +7,10 @@ import com.aic.aicdetactor.comm.CommonDef;
 import com.aic.aicdetactor.database.TemporaryRouteDao;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTabHost;
@@ -21,6 +24,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 
 public class DownLoadFragment extends Fragment implements OnClickListener {
 	private LinearLayout mSetting_linearLayout = null; 
@@ -42,8 +46,9 @@ public class DownLoadFragment extends Fragment implements OnClickListener {
 	private RadioGroup mUp_RadioGroup = null;
 	private String mStr_Up_IP="";
 	private String mStr_Up_Pda_code="";
+	//本机在WIFI状态下路由分配给的IP地址  
 	private String mStr_Up_Pda_ip="";
-	private String mStr_Up_Pda_mac="";
+	private String mPda_mac="";
 	private int mUp_RadioGroup_Index =-1;
 	private Button mUp_Button = null;
 	private boolean mbUp_auto_up = false;
@@ -64,6 +69,10 @@ public class DownLoadFragment extends Fragment implements OnClickListener {
 	private String mStr_Setting_Pda_code="";
 	private CheckBox mSetting_CheckBox_OnlyWifi = null;
 	private boolean mbSetting_Only_Wifi = false;
+	private TextView mUpMacTextView = null;
+	private TextView mDownMacTextView = null;
+	private TextView mUpIPTextView = null;
+	private TextView mDownIPTextView = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -83,6 +92,11 @@ public class DownLoadFragment extends Fragment implements OnClickListener {
 		mSetting_linearLayout = (LinearLayout)view.findViewById(R.id.setting_linear);
 		mUp_linearLayout = (LinearLayout)view.findViewById(R.id.up_linear);
 		mDown_linearLayout = (LinearLayout)view.findViewById(R.id.down_linear);
+		mUpMacTextView = (TextView)view.findViewById(R.id.textView_up_pda_mac);
+		mDownMacTextView = (TextView)view.findViewById(R.id.textView_down_pda_mac);
+		mUpIPTextView= (TextView)view.findViewById(R.id.textView_up_pda_ip);
+		mDownIPTextView= (TextView)view.findViewById(R.id.textView_down_pda_ip);
+		displayMacAndIPAddress();
 		//选项 上传  下载 设置
 		mRadioGroup = (RadioGroup)view.findViewById(R.id.downup_group);
 		mRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
@@ -284,5 +298,26 @@ public class DownLoadFragment extends Fragment implements OnClickListener {
 		case R.id.down_down:
 			break;
 		}
+	}
+	
+	void displayMacAndIPAddress(){
+		WifiManager wifiMan = (WifiManager) this.getActivity().getSystemService(Context.WIFI_SERVICE);  
+		WifiInfo info = wifiMan.getConnectionInfo();  
+		mPda_mac = info.getMacAddress();// 获得本机的MAC地址  
+		String ssid = info.getSSID();// 获得本机所链接的WIFI名称  
+		  
+		int ipAddress = info.getIpAddress();  
+		  
+		// 获得IP地址的方法一：  
+		if (ipAddress != 0) {  
+			mStr_Up_Pda_ip = ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."   
+		        + (ipAddress >> 16 & 0xff) + "." + (ipAddress >> 24 & 0xff));  
+		}  
+		
+		mUpMacTextView.setText(mPda_mac);
+		mDownMacTextView.setText(mPda_mac);
+		
+		mUpIPTextView.setText(mStr_Up_Pda_ip);
+		mDownIPTextView.setText(mStr_Up_Pda_ip);
 	}
 }

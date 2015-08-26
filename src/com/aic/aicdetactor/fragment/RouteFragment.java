@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,6 +23,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.SimpleAdapter;
 
 import com.aic.aicdetactor.R;
+
 import com.aic.aicdetactor.app.myApplication;
 import com.aic.aicdetactor.check.StationActivity;
 import com.aic.aicdetactor.comm.CommonDef;
@@ -36,8 +39,10 @@ public class RouteFragment extends Fragment {
 
 
 
+	private myApplication app = null;
 	private final int ROUTE_XJ =0;
 	private final int ROUTE_Temp= 1;
+	private final int ROUTE_Spec= 2;
 	private int mSelectedRadioIndex =0;
 	//private String name = null;
 	//private String pwd= null;
@@ -54,7 +59,7 @@ public class RouteFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		
+		app =(myApplication) RouteFragment.this.getActivity().getApplication();
 		View view = inflater.inflate(R.layout.route_activity, container, false);
 	
 		mListView = (ListView) view.findViewById(R.id.listView);	
@@ -72,10 +77,13 @@ public class RouteFragment extends Fragment {
 					mSelectedRadioIndex =0;
 					break;
 				case R.id.route_radioButton2:
+					initListData(ROUTE_Spec);
+					mSelectedRadioIndex =1;
+					break;
+				case R.id.route_radioButton3:
 					initListData(ROUTE_Temp);
 					mSelectedRadioIndex =1;
 					break;
-				
 				}
 			}
 			
@@ -113,13 +121,12 @@ public class RouteFragment extends Fragment {
 								+ " pathname is "
 								+ (String) mapItem
 										.get(CommonDef.route_info.NAME));
-				((myApplication) RouteFragment.this.getActivity().getApplication()).gRouteName = mapItem.get(CommonDef.route_info.NAME);
-				 ((myApplication) RouteFragment.this.getActivity().getApplication()).mRouteIndex = arg2;
+				app.gRouteName = mapItem.get(CommonDef.route_info.NAME);
+				 app.mRouteIndex = arg2;
 				Intent intent = new Intent();
 				intent.putExtra(CommonDef.route_info.LISTVIEW_ITEM_INDEX,
 						arg2);
-				((myApplication) RouteFragment.this.getActivity().getApplication())
-						.setCurrentRouteIndex(arg2);
+				app.setCurrentRouteIndex(arg2);
 				intent.putExtra(CommonDef.ROUTE_CLASS_NAME, "计划巡检");
 				intent.putExtra(CommonDef.route_info.NAME,
 						(String) mapItem.get(CommonDef.route_info.NAME));
@@ -144,7 +151,7 @@ public class RouteFragment extends Fragment {
 		if(type == ROUTE_XJ){
 		Log.d(TAG, "in init() 1 start " + SystemUtil.getSystemTime(SystemUtil.TIME_FORMAT_YYMMDDHHMM));
 		
-		int iRouteCount = ((myApplication) RouteFragment.this.getActivity().getApplication()).InitData();
+		int iRouteCount = app.InitData();
 		Log.d(TAG, "in init() 2 start " + SystemUtil.getSystemTime(SystemUtil.TIME_FORMAT_YYMMDDHHMM));
 		CheckStatus status = null;
 		mItemDatas.clear();
@@ -153,12 +160,9 @@ public class RouteFragment extends Fragment {
 				Log.d(TAG, "in init() for start i=" + routeIndex + ","
 						+ SystemUtil.getSystemTime(SystemUtil.TIME_FORMAT_YYMMDDHHMM));
 				Map<String, String> map = new HashMap<String, String>();
-				status = ((myApplication) RouteFragment.this.getActivity().getApplication()).getNodeCount(null,
-						0, routeIndex);
+				status = app.getNodeCount(null,	0, routeIndex);
 				status.setContext(RouteFragment.this.getActivity().getApplicationContext());
-				map.put(CommonDef.route_info.NAME,
-						((myApplication) RouteFragment.this.getActivity().getApplication())
-								.getRoutName(routeIndex));
+				map.put(CommonDef.route_info.NAME,app.getRoutName(routeIndex));
 				map.put(CommonDef.route_info.DEADLINE, status.mLastTime);
 				map.put(CommonDef.route_info.STATUS, status.getStatus());
 

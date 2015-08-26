@@ -23,7 +23,9 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_gravity="bottom|center"
-	    android:background="@drawable/top_item_selected">
+	    android:background="@drawable/top_item_selected"
+	    android:padding="0dp"
+	    android:layout_margin="0dp">
 
 	    <Button
 		    android:id="@+id/bottombutton_pre"

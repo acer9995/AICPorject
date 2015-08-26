@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -277,4 +278,28 @@ public class  SystemUtil {
 		return str;
 	}
 
+	/**
+	 * 计算给定两个时间的差
+	 * 入参 time 格式必须是 "yyyy-MM-dd HH:mm:ss" 
+	 * @param time
+	 * @param endTime
+	 * @return 单位 秒
+	 */
+	public static String getDiffDate(String time, String endTime) {
+		if("".equals(time)||"".equals(endTime)){return ""+0;}
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			Date d1 = df.parse(time);
+			Date d2 = df.parse(endTime);
+			long diff = d2.getTime() - d1.getTime();
+			long minutes = diff / 1000;
+			return "" + minutes;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return ""+0;
+	}
+	
 }

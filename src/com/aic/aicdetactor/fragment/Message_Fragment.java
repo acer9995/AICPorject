@@ -41,6 +41,7 @@ public class Message_Fragment extends Fragment {
 	private List<Map<String, String>> mItemDatas = null;
 	private final String TAG = "luotest";
 	private SimpleAdapter mListViewAdapter = null;
+	private myApplication app = null;
 	//GridView mGridView = null;
 	//TabHost mTabHost = null;
 	@Override
@@ -54,6 +55,7 @@ public class Message_Fragment extends Fragment {
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		//return super.onCreateView(inflater, container, savedInstanceState);
+		app =(myApplication) Message_Fragment.this.getActivity().getApplication();
 		View view = inflater.inflate(R.layout.message, container, false);
 		mListView = ( ListView)view.findViewById(R.id.msg_listView1);
 		
@@ -112,8 +114,8 @@ public class Message_Fragment extends Fragment {
 	 * 默认查询未读的消息
 	 */
 	void initData(int type){
-		if(((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerName == null
-				&&((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerNumber ==null
+		if(app.mWorkerName == null
+				&&app.mWorkerPwd ==null
 				){
 			Toast.makeText(this.getActivity(), "您还没登录", Toast.LENGTH_SHORT).show();
 			return;
@@ -122,8 +124,8 @@ public class Message_Fragment extends Fragment {
 		TemporaryRouteDao info = new TemporaryRouteDao(this.getActivity().getApplicationContext());
 		
 		 List<TemporaryDataBean>  list=		info.queryTemporaryInfoList(type,
-				((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerName,
-				((myApplication) Message_Fragment.this.getActivity().getApplication()).mWorkerNumber);
+				app.mWorkerName,
+				app.mWorkerPwd);
 		 
 		 
 

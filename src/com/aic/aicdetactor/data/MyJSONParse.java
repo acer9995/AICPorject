@@ -137,6 +137,35 @@ public class MyJSONParse {
 		//}
 		return 1;
 	}
+	public int insertUpLoadInfo(Context context){
+		if(mContext == null){
+			mContext = context;
+		}
+		upLoadInfo up = new upLoadInfo();
+		up.Base_Point="point";
+		up.Class_Group = "work";//worker 数据表中
+		up.Date= SystemUtil.getSystemTime(0);
+		up.File_Guid = "guid";//worker 数据表中,文件名
+		up.Is_Updateed = ""+0;;
+		up.Is_Uploaded=""+0;
+		up.Span="span";
+		up.Start_Point="point";
+		up.T_Line_Guid=SystemUtil.createGUID();//worker数据表总
+		up.T_Line_Name = "guid+worker+turn+system";
+		up.T_Period_Unit_Code="";
+		up.Task_Mode="0";
+		up.Turn_Finish_Mode="0";
+		up.Turn_Name="";
+		up.Turn_Number="";
+		up.Worker_Name="";
+		up.Turn_Number="";
+		if(mRouteDao== null){
+			mRouteDao = new RouteDao(mContext);
+			}
+		//if(mRouteDao.getCount()<12){		
+		mRouteDao.insertUploadFile(up);
+		return 1;
+	}
 	public static T_Route getPlanInfo(String Routepath){
 		T_Route route = new T_Route();
 		String data = SystemUtil.openFile(Routepath);	
@@ -154,6 +183,7 @@ public class MyJSONParse {
 				route.mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
 				JSONObject sub_object = object.getJSONObject(T_Period.RootNodeName);
 				route.mT_PeriodArray = sub_object.getJSONArray(T_Period.ArrayName);
+				route.mOrganizationObject = object.getJSONObject(T_Organization.NodeName);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -180,12 +210,12 @@ public class MyJSONParse {
 		
 		T_Route info =mRouteList.get(RouteIndex);
 		
-//		try {
-//			info.SaveData(fileName);
-//		} catch (JSONException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			info.SaveData(fileName);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -208,16 +238,18 @@ public class MyJSONParse {
 				mRouteList.get(routeIndex).mGloableObject = object.getJSONObject(GlobalInfo.NodeName);
 				mRouteList.get(routeIndex).mLineObject =object.getJSONObject(T_Line.RootNodeName);
 				mRouteList.get(routeIndex).mStationArrary= (JSONArray) object.getJSONArray(KEY.KEY_STATIONINFO);
+				mRouteList.get(routeIndex).Item_Abnormal_GradeArrary= (JSONArray) object.getJSONArray(KEY.KEY_T_Item_Abnormal_Grade);
+				mRouteList.get(routeIndex).Measure_TypeArrary= (JSONArray) object.getJSONArray(KEY.KEY_T_Measure_Type);
 				mRouteList.get(routeIndex).mTurnArrary= (JSONArray) object.getJSONArray(T_Turn.RootNodeName);
 				mRouteList.get(routeIndex).mWorkerArrary= (JSONArray) object.getJSONArray(T_Worker.RootNodeName);
-				
+				mRouteList.get(routeIndex).mOrganizationObject = object.getJSONObject(T_Organization.NodeName);
 				JSONObject sub_object = object.getJSONObject(T_Period.RootNodeName);
 				mRouteList.get(routeIndex).mT_PeriodArray = sub_object.getJSONArray(T_Period.ArrayName);
 				
 				if (mRouteList.get(routeIndex).mWorkerArrary != null) {
 					try {
 
-						mRouteList.get(routeIndex).mWorkerList = MyJSONParse.parseWorkerNode(mRouteList.get(routeIndex).mWorkerArrary);
+						mRouteList.get(routeIndex).mWorkerList = parseWorkerNode(mRouteList.get(routeIndex).mWorkerArrary);
 						Log.e("luotest", "parseBaseInfo() mWorkerList is" + mRouteList.get(routeIndex).mWorkerList.toString());
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
@@ -226,7 +258,7 @@ public class MyJSONParse {
 				}
 				 if(mRouteList.get(routeIndex).mLineObject != null){
 				 try {
-					 mRouteList.get(routeIndex).mLineInfo = MyJSONParse.parseRouteNameNode(mRouteList.get(routeIndex).mLineObject);
+					 mRouteList.get(routeIndex).mLineInfo = parseRouteNameNode(mRouteList.get(routeIndex).mLineObject);
 					
 				 } catch (JSONException e) {
 				 // TODO Auto-generated catch block
@@ -235,7 +267,7 @@ public class MyJSONParse {
 				 }
 				if (mRouteList.get(routeIndex).mTurnArrary != null) {
 					try {
-						mRouteList.get(routeIndex).mTurnList = MyJSONParse.parseTurnNode(mRouteList.get(routeIndex).mTurnArrary);
+						mRouteList.get(routeIndex).mTurnList = parseTurnNode(mRouteList.get(routeIndex).mTurnArrary);
 						Log.e("luotest", "parseBaseInfo() mTurnList is" + mRouteList.get(routeIndex).mTurnList.toString());
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
@@ -250,13 +282,6 @@ public class MyJSONParse {
 		}
 
 	}
-	
-	public void setAuxiliaryNode(int RouteIndex,Object object){
-
-		//mRouteList.get(RouteIndex).mAuxiliary_Root_Object = object;
-	}
-
-
 	
 	
 	/**
@@ -326,11 +351,16 @@ public class MyJSONParse {
 				itemList = this.getDeviceList((JSONObject) list.get(i));
 				
 				for (int n = 0; n < itemList.size(); n++) {
-					List<Object> partlist = this.getPartList(itemList.get(n));
+					Object deviceItemObject = itemList.get(n);
+					List<Object> partlist = this.getPartList(deviceItemObject);
+					//Is_Device_Checked : 0
+//					if(((JSONObject)deviceItemObject).optBoolean("Is_Device_Checked")){
+//						status.mCheckedCount++;
+//					}
 					count = count + partlist.size();
 					for(int k=0;k<partlist.size();k++){
 						JSONObject itemObject = (JSONObject) partlist.get(k);				
-						checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
+						checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_ADD_END_DATE_20);
 						if(checkTimeStr != null){
 							status.mCheckedCount++;
 							status.mLastTime = checkTimeStr;
@@ -348,11 +378,15 @@ public class MyJSONParse {
 			List<Object> devicelist = this.getDeviceList((JSONObject) Object);
 			List<Object> partlist =null;
 			for (int n = 0; n < devicelist.size(); n++) {
-				partlist = this.getPartList(devicelist.get(n));
+				Object deviceItemObject = devicelist.get(n);
+				partlist = this.getPartList(deviceItemObject);
+//				if(((JSONObject)deviceItemObject).optBoolean("Is_Device_Checked")){
+//					status.mCheckedCount++;
+//				}
 				count = count + partlist.size();
 				for(int k=0;k<partlist.size();k++){
 					JSONObject itemObject = (JSONObject) partlist.get(k);				
-					checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
+					checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_ADD_END_DATE_20);
 					if(checkTimeStr != null){
 						status.mCheckedCount++;
 						status.mLastTime = checkTimeStr;
@@ -368,11 +402,14 @@ public class MyJSONParse {
 			List<Object> partlist = this.getPartList((JSONObject) Object);
 			count = partlist.size();
 			JSONObject itemObject = null;	
-			
+//			if(((JSONObject)Object).optBoolean("Is_Device_Checked")){
+//				status.mCheckedCount++;
+//			}
 			for (int k = 0; k < partlist.size(); k++) {
 				Log.d(TAG, " getDevicePartItemCount k=" + k + "," + partlist.get(k));
-				itemObject = (JSONObject) partlist.get(k);			
-				checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_CHECKED_TIME);
+				itemObject = (JSONObject) partlist.get(k);	
+				
+				checkTimeStr = this.getPartItemCheckUnitName(itemObject, CommonDef.partItemData_Index.PARTITEM_ADD_END_DATE_20);
 				if(checkTimeStr != null){
 					status.mCheckedCount++;
 					status.mLastTime = checkTimeStr;
@@ -388,7 +425,38 @@ public class MyJSONParse {
 		return status;
 	}
 	
-	
+	/**
+	 * 根据stationIndex,查询没有巡检的DeviceIndex,以便上层丛此处开始巡检
+	 * @param mStationIndex
+	 * @return
+	 */
+	public ContentValues getNeedCheckDeviceItemIndex(int mStationIndex){
+		ContentValues va = new ContentValues();
+		int index =-1;
+		String name ="";
+		Log.d(TAG, "getNeedCheckDeviceItemIndex() ");
+		try {
+			List<Object> deviceItemList = getDeviceItem(mStationIndex);
+			for ( int i = 0; i < deviceItemList.size(); i++) {
+				JSONObject object = (JSONObject) deviceItemList.get(i);
+				Log.d(TAG, "getNeedCheckDeviceItemIndex() "+i + ",object is "+object.toString());
+				int b =object.optInt(T_Device_Item.Device_Array_Item_Const.Key_Is_Device_Checked);
+				Log.d(TAG, "getNeedCheckDeviceItemIndex() b ="+b);
+				if(b==0){
+					index = i;
+					name = object.optString(T_Device_Item.Device_Array_Item_Const.Key_Name);
+					break;
+				}
+				
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		va.put(KEY.KEY_Device_Index, index);
+		va.put(KEY.KEY_Device_Name, name);
+		return va;
+	}
 
 
 	/**
@@ -455,6 +523,7 @@ public class MyJSONParse {
 		return name;
 	}
 
+	
 	// input params must be StationItem
 	public List<Object> getDeviceList(Object StationItemobject)
 			throws JSONException {
@@ -483,13 +552,30 @@ public class MyJSONParse {
 
 	}
 
-	public List<Object>getPartItem(Object object){
+	/**
+	 * 根据Item_def_type 丛PartItem数组中获取指定数据。如果Item_def_type 为-1的，即全部数据，不用筛选
+	 * 否则都需要筛选。
+	 * @param object
+	 * @param Item_def_type
+	 * @return
+	 */
+	public List<Object>getPartItem(Object object,int Item_def_type){
 		List<Object>list = new ArrayList<Object>();
 		
 		try {
 			JSONArray array = ((JSONObject)object).getJSONArray(KEY.KEY_PARTITEM);
 			for(int i=0;i<array.length();i++){
+				if(Item_def_type ==-1){
 				list.add(array.get(i));
+				}else{
+					JSONObject part=(JSONObject) array.get(i);
+					 String str =  part.optString(KEY.KEY_PARTITEMDATA);
+					 String def=getPartItemSubStr(str,CommonDef.partItemData_Index.PARTITEM_START_STOP_STATUS_FLAG);
+					 int iv=Integer.valueOf(def);
+					 if((iv<<Item_def_type)>0){
+						 list.add(array.get(i));
+					 }
+				}
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -611,6 +697,9 @@ public class MyJSONParse {
 			Log.d(TAG, "getPartItemSubStr index out of array size");
 			return null;
 		}
+//		for(int i =0;i<array.length;i++){
+//		Log.d(TAG, "getPartItemSubStr array is "+array[i]);
+//		}
 
 		return array[index];
 
@@ -618,7 +707,6 @@ public class MyJSONParse {
 
 	// input params must be partItem sub
 		public String getPartItemCheckUnitName(Object partItemobject,int index) {
-			//Log.d(TAG, "getPartItemName 0");
 			if (partItemobject == null) {
 				Log.d(TAG, "getPartItemCheckUnitName " + " object is null");
 				return null;
@@ -627,15 +715,10 @@ public class MyJSONParse {
 			try {
 				JSONObject newObject = (JSONObject) partItemobject;
 
-				//Log.d(TAG, "getPartItemName 3");
 				name = newObject.getString(KEY.KEY_PARTITEMDATA);
-				String nameArray[] = name.split("\\*");
-				if((nameArray.length <20) ){
-					name = getPartItemSubStr(name,index);
-				}else{
-					Log.d(TAG, "getPartItemCheckUnitName() has checked ");
-				}
-				//Log.d(TAG, "getPartItemName 4");
+				Log.d(TAG, "getPartItemName 3 name is " +name);
+				name = getPartItemSubStr(name,index);
+				Log.d(TAG, "getPartItemName 4 name is " +name);
 
 			} catch (Exception e) {
 				Log.e(TAG,e.toString());;
@@ -673,9 +756,9 @@ public class MyJSONParse {
 		Temperature info = new Temperature();
 		String name = getPartItemName(object);		
 		if(name != null){
-			info.max = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MAX_VALUE_NAME));
-			info.mid = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MIDDLE_VALUE_NAME));
-			info.min = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MIN_VALUE_NAME));
+			info.max = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MAX_VALUE));
+			info.mid = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MIDDLE_VALUE));
+			info.min = SystemUtil.getTemperature(this.getPartItemSubStr(name, CommonDef.partItemData_Index.PARTITEM_MIN_VALUE));
 		}		
 		return info;
 	}
@@ -718,8 +801,8 @@ public static List<WorkerInfo> parseWorkerNode(JSONArray WorkerObject) throws JS
 			WorkerInfo info = new WorkerInfo();
 			info.Alias_Name = jsonObject.getString(T_Worker.Worker_Const.Key_Alias_Name);
 			info.Class_Group = jsonObject.optString(T_Worker.Worker_Const.Key_Class_Group);
-			info.Mumber = jsonObject.getString(T_Worker.Worker_Const.Key_Mumber);
-			info.Name = jsonObject.getString(T_Worker.Worker_Const.Key_Name);
+			info.Number = jsonObject.getString(T_Worker.Worker_Const.Key_Number);
+			info.Name = jsonObject.optString(T_Worker.Worker_Const.Key_Name);			
 			info.T_Line_Content_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Content_Guid);
 			info.T_Line_Guid = jsonObject.getString(T_Worker.Worker_Const.Key_T_Line_Guid);
 			
@@ -788,7 +871,7 @@ public static List<TurnInfo> parseTurnNode(JSONArray TurnObject) throws JSONExce
 	}
 
 	public Object getStationItem(int routeIndex,int index) {
-		Log.d(TAG, "getStationItem");
+		Log.d(TAG, "getStationItem routeIndex ="+routeIndex +",index="+index +",mRouteIndex ="+mRouteIndex +",mStationIndex = "+mStationIndex);
 		return mRouteList.get(mRouteIndex).mStationList.get(mStationIndex);
 
 	}
@@ -796,6 +879,27 @@ public static List<TurnInfo> parseTurnNode(JSONArray TurnObject) throws JSONExce
 	public Object genObject(Object object,String value){
 		Object newobject = null;
 		return newobject;
-	}
+	}	
 	
+	/**
+	 * 根据ItemDef 选择的 运行/停止/备用/其他等 来筛选有效的 PartItemData巡检项数据
+	 * @param PartItem
+	 * @param typeIndex
+	 * @return
+	 */
+	public List<Object> fliterPartItemData(JSONArray PartItemArray,int typeIndex){
+		List<Object> list = null;
+		if(PartItemArray == null){return null;}
+		for(int i =0;i<PartItemArray.length();i++){
+		try {
+			JSONObject object = (JSONObject) PartItemArray.get(i);
+			
+			getPartItemSubStr(object.optString(KEY.KEY_PARTITEMDATA),typeIndex);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		}
+		return list;
+	}
 }

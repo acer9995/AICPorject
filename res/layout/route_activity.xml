@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
         android:id="@+id/route_linear1"
-        android:layout_marginTop="30dp">"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">"
         
 		 <RadioGroup
 		        android:layout_width="match_parent"
@@ -19,22 +20,39 @@
 		        android:orientation="horizontal" 
 		        android:id="@+id/route_group"		        
 		        android:gravity="center"
-		        android:padding="1dp">
+		        android:padding="1dp"
+		        android:background="@color/ivory"
+		        >
 		        <RadioButton
 		            android:id="@+id/route_radioButton1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:button="@drawable/route_plan_selector"
-		            android:checked="true"/>
-		
+		            android:background="@drawable/top_item_selector"
+		            android:checked="true"
+		            android:button="@null"
+		            android:text="@string/plancheck_name"
+		            android:textSize="@dimen/top_item_text_size"/>		
 		        <RadioButton
 		            android:id="@+id/route_radioButton2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"		           
-		            android:button="@drawable/route_temporary_selector"
+		            android:background="@drawable/top_item_selector"
+		            android:button="@null"
+		            android:text="@string/tem_spec"
+		            android:textSize="@dimen/top_item_text_size"
+		           />	
+		            <RadioButton
+		            android:id="@+id/route_radioButton3"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"		           
+		            android:background="@drawable/top_item_selector"
+		            android:button="@null"
+		            android:text="@string/tem_check"
+		            android:textSize="@dimen/top_item_text_size"
 		           />	
 		       
 		</RadioGroup> 
+		
 		  </LinearLayout>
 		  
     <LinearLayout
@@ -50,8 +68,7 @@
         android:id="@+id/listView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/red_line1"
-       
+        android:layout_below="@+id/red_line1"      
        />
 
         

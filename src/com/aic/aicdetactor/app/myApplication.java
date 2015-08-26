@@ -155,6 +155,9 @@ public class myApplication extends Application
     	return 1;
     }
     
+    public int insertUpLoadInfo(Context context){
+    	return json.insertUpLoadInfo(context);
+    }
     /**
      * 获取指定序号的巡检路线对应的站点集合
      * @param routeIndex
@@ -174,7 +177,9 @@ public class myApplication extends Application
     public List<Object> getDeviceItemList(int stationIndex) throws JSONException {
     	return json.getDeviceItem(stationIndex);
     }
-
+    public ContentValues getNeedCheckDeviceItemIndex(int stationIndex){
+    	return json.getNeedCheckDeviceItemIndex(stationIndex);
+    }
     public CheckStatus getNodeCount(Object Object,int nodeType,int RouteIndex) throws JSONException{
     	return json.getNodeCount(Object,nodeType,RouteIndex);
     }
@@ -225,15 +230,20 @@ public class myApplication extends Application
     public void SaveData(int RouteIndex,String fileName){
     	 json.SaveData(RouteIndex,fileName);
     }
-    public void setAuxiliaryNode(int RouteIndex,Object object){
-    	 json.setAuxiliaryNode(RouteIndex,object);
-    }
+//    public void setAuxiliaryNode(int RouteIndex,Object object){
+//    	 json.setAuxiliaryNode(RouteIndex,object);
+//    }
     
     public List<TurnInfo>getRouteTurnInfoList() throws JSONException{
     	return json.getTurnInfoItem(mRouteIndex);
     }
-    public List<Object>getPartItem(Object object){
-    	return json.getPartItem(object);
+    /**
+     * 
+     * @param object:PartItem
+     * @return
+     */
+    public List<Object>getPartItem(Object object,int item_def_index){
+    	return json.getPartItem(object,item_def_index);
     }
 
 }

@@ -112,6 +112,7 @@ public class T_Device_Item {
 		public static final String Key_Is_In_Place="Is_In_Place";
 		public static final String Key_Is_RFID_Checked="Is_RFID_Checked";
 		public static final String Key_Data_Exist_Guid="Data_Exist_Guid";
+		public static final String Key_PartItem="PartItem";
 	}
 	
 	/**

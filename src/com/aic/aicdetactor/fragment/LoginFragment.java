@@ -111,6 +111,9 @@ public class LoginFragment extends Fragment implements OnClickListener{
 	Log.d(TAG," Login() error = "+ cv.get("error"));
 	
 	if(fileList.size()>0){	
+		ContentValues cverr = new ContentValues();
+//		dao.ModifyWorkerPwd(mLogName, mLogPwd, "11111111",cverr);
+//		Log.d(TAG," Login() modify error = "+ cverr.get("error"));
 		return true;
 	}
 	return false;

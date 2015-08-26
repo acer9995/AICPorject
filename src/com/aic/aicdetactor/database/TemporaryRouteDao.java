@@ -37,7 +37,7 @@ public class TemporaryRouteDao {
 	public static final int SEACHER_TYPE_ALL =2;
 	public static final int SEACHER_TYPE_UNREAD =3;
 	private SQLiteDatabase mDB = null;
-
+    private final String TAG = "luotest";
 	public TemporaryRouteDao(Context cxt) {
 		helper = new DBHelper(cxt);
 		mContext = cxt;
@@ -244,8 +244,7 @@ public class TemporaryRouteDao {
 			whereStr = DBHelper.Temporary_Table.T_Worker_R_Name +"=? and "+
 					DBHelper.Temporary_Table.T_Worker_R_Mumber +" =?  and "
 					+ DBHelper.Temporary_Table.Is_Original_Line +" =? ";
-			whereValueStr = new String[] { Name, WorkerNumber,"1"};
-			
+			whereValueStr = new String[] { Name, WorkerNumber,"1"};			
 			
 			break;
 		case SEACHER_TYPE_UNREAD:
@@ -257,7 +256,7 @@ public class TemporaryRouteDao {
 			break;
 		}
 		
-		
+		Log.d(TAG, "queryTemporaryInfoList() Name is "+Name +",WorkerNumber is "+WorkerNumber);
 		cursor = mDB.query(DBHelper.TABLE_TEMPORARY,						
 				null,
 				whereStr,					

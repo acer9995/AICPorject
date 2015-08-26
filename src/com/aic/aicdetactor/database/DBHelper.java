@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
 	 private final static String DB_NAME ="aicdatabase.db";//数据库名
-	 private final static int VERSION = 5;//版本号
+	 private final static int VERSION = 7;//版本号
 	 
 	  
 	//保存从服务器接收到的原始巡检数据信息
@@ -50,11 +50,14 @@ public class DBHelper extends SQLiteOpenHelper {
 	 public class Plan_Worker_Table{
 		public static final   String Alias_Name = "Alias_Name";
 		public static final   String Class_Group  = "Class_Group";
-		public static final   String Mumber  = "Mumber";
+		public static final   String Number  = "Number";
 		public static final   String Name  ="Name";
 		public static final   String T_Line_Content_Guid ="T_Line_Content_Guid";
 		public static final   String T_Line_Guid ="T_Line_Guid";
 		public static final   String T_Organization_Guid  ="T_Organization_Guid";
+		public static final  String Pwd ="pwd";
+		public static final  String IsModifyPwd = "IsModifyPwd";
+		public static final  String newPwd = "newPwd";
 	 }
 	 public static String TABLE_TURN = "TurnInfo";
 	 public class Plan_Turn_Table{
@@ -122,6 +125,36 @@ public class DBHelper extends SQLiteOpenHelper {
 		 public static final String Is_Original_Line = "Is_Original_Line";
 		 public static final String Is_Readed = "Is_Readed";
 	 } 
+	 //T_Organization
+	 public static String TABLE_T_Organization_CorporationName = "T_Organization_CorporationName";  
+	 public class Organization_CorporationName_Table{ 
+		 public static final String CorporationName = "CorporationName";
+	 } 
+	 
+	 //GroupName
+	 public static String TABLE_T_Organization_GroupName = "T_Organization_GroupName";  
+	 public class Organization_GroupName_Table{ 
+		 public static final String GroupName = "GroupName";
+	 } 
+	 
+	 //WorkShopName
+	 public static String TABLE_T_Organization_WorkShopName = "T_Organization_WorkShopName";  
+	 public class Organization_WorkShopName_Table{ 
+		 public static final String WorkShopName = "WorkShopName";
+	 } 
+	 
+	//Periods
+		 public static String TABLE_Periods = "Periods";  
+		 public class Periods_Table{ 
+			 public static final String Is_Omission_Check = "Is_Omission_Check";
+			 public static final String Is_Permission_Timeout = "Is_Permission_Timeout";
+			 public static final String Span = "Span";
+			 public static final String Start_Point = "Start_Point";
+			 public static final String T_Turn_Number_Array = "T_Turn_Number_Array";
+			 public static final String	 Task_Mode = "Task_Mode";
+			 public static final String	 Turn_Finish_Mode = "Turn_Finish_Mode";
+			 public static final String Line_Guid = "Line_Guid";
+		 } 
 	 //自带的构造方法
 	 public DBHelper(Context context, String name, CursorFactory factory,
 	   int version) {
@@ -180,10 +213,13 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ Plan_Worker_Table.Name+" varchar(256),"
 				+ Plan_Worker_Table.Alias_Name+" varchar(256)," 
 				+ Plan_Worker_Table.Class_Group +" varchar,"
-				+ Plan_Worker_Table.Mumber +" varchar,"
+				+ Plan_Worker_Table.Number +" varchar,"
 				+ Plan_Worker_Table.T_Line_Content_Guid + " varchar(256),"
 				+ Plan_Worker_Table.T_Line_Guid + " varchar(128),"
-				+ Plan_Worker_Table.T_Organization_Guid + " varchar(256)"				
+				+ Plan_Worker_Table.T_Organization_Guid + " varchar(256),"
+				+ Plan_Worker_Table.Pwd +" varchar(256),"
+				+ Plan_Worker_Table.IsModifyPwd +" BOOLEAN ,"
+				+ Plan_Worker_Table.newPwd +" varchar(256)"
 				+")";
 
 		db.execSQL(workerSql);
@@ -205,7 +241,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ Checking_Table.Worker_Number +" varchar(24),"
 				+ Checking_Table.Class_Group +" varchar(128),"
 				+ Checking_Table.Turn_Name +" varchar(128),"
-				
+				+ Checking_Table.File_Guid +" varchar(256),"
 				+ Checking_Table.Turn_Number +" varchar(256),"
 				+ Checking_Table.Date +" varchar(256),"
 				+ Checking_Table.Is_Uploaded +" BOOLEAN,"
@@ -239,8 +275,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ Temporary_Table.Content+" varchar(400)," 
 				+ Temporary_Table.GroupName +" varchar(16),"
 				+ Temporary_Table.CorporationName +" varchar(8),"
-				+ Temporary_Table.WorkShopName + " varchar(256),"
-				
+				+ Temporary_Table.WorkShopName + " varchar(256),"				
 				+ Temporary_Table.DevName+" varchar(256),"
 				+ Temporary_Table.DevSN+" varchar(400)," 
 				+ Temporary_Table.Task_Mode +" INT,"
@@ -264,13 +299,51 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ Temporary_Table.T_Temporary_Line_Guid+" varchar(400)," 
 				+ Temporary_Table.Guid +" varchar(16),"
 				+ Temporary_Table.Is_Original_Line +" BOOLEAN,"
-				+ Temporary_Table.Is_Readed + " BOOLEAN"
-				
+				+ Temporary_Table.Is_Readed + " BOOLEAN"				
 				+")";
 
 		db.execSQL(temporartSql);
 		
 		
+		
+		//Organization_CorporationName_Table
+		String Oragniation_corpSql = "create table IF NOT EXISTS "
+				+ TABLE_T_Organization_CorporationName 
+				+ "(" 
+				+ Organization_CorporationName_Table.CorporationName+" varchar(256) PRIMARY KEY"				
+				+")";
+		db.execSQL(Oragniation_corpSql);
+		
+		//TABLE_T_Organization_GroupName
+		String Organization_GrouSql = "create table IF NOT EXISTS "
+				+ TABLE_T_Organization_GroupName 
+				+ "(" 
+				+ Organization_GroupName_Table.GroupName+" varchar(256) PRIMARY KEY"				
+				+")";
+		db.execSQL(Organization_GrouSql);
+		
+		//TABLE_T_Organization_WorkShopName
+		String Organization_WorkShopNameSql = "create table IF NOT EXISTS "
+				+ TABLE_T_Organization_WorkShopName 
+				+ "(" 
+				+ Organization_WorkShopName_Table.WorkShopName+" varchar(256) PRIMARY KEY"				
+				+")";
+		db.execSQL(Organization_WorkShopNameSql);
+
+		//Period Table
+		String PeriodSql = "create table IF NOT EXISTS "
+				+ TABLE_Periods 
+				+ "(" 
+				+ Periods_Table.Is_Omission_Check+" varchar(256) ,"	
+				+ Periods_Table.Is_Permission_Timeout+" varchar(256) ,"	
+				+ Periods_Table.Line_Guid+" varchar(256) ,"	
+				+ Periods_Table.Span+" varchar(256) ,"	
+				+ Periods_Table.Start_Point+" varchar(256) ,"	
+				+ Periods_Table.T_Turn_Number_Array+" varchar(256), "	
+				+ Periods_Table.Task_Mode+" varchar(256), "
+				+ Periods_Table.Turn_Finish_Mode+" varchar(256) "
+				+")";
+		db.execSQL(PeriodSql);
 
 	}
 
@@ -299,6 +372,19 @@ public class DBHelper extends SQLiteOpenHelper {
 	  
 	  sql  = "DROP TABLE IF EXISTS "+TABLE_TEMPORARY;
 	  db.execSQL(sql);
+	  
+	  sql  = "DROP TABLE IF EXISTS "+TABLE_T_Organization_CorporationName;
+	  db.execSQL(sql);
+	  
+	  sql  = "DROP TABLE IF EXISTS "+TABLE_T_Organization_GroupName;
+	  db.execSQL(sql);
+	  
+	  sql  = "DROP TABLE IF EXISTS "+TABLE_T_Organization_WorkShopName;
+	  db.execSQL(sql);
+	  
+	  sql  = "DROP TABLE IF EXISTS "+TABLE_Periods;
+	  db.execSQL(sql);
+	  
 	 }
 	 
 	 
